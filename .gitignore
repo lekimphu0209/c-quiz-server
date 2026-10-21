@@ -1,0 +1,97 @@
+# ==========================================
+# C Quiz Server - .gitignore
+# ==========================================
+
+# OS & Editor files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# AI Tools, Agents, Skills, Hooks & MCP Configurations
+.agents/
+.agent/
+_agents/
+_agent/
+.gemini/
+.claude/
+.cursor/
+.aider/
+.continue/
+.ai/
+.understand-anything/
+.memory/
+*memory/
+*ai-cache/
+.llm-cache/
+.codeanalysis/
+skills/
+hooks/
+hooks.json
+mcp_config.json
+AGENTS.md
+CLAUDE.md
+TASKS.md
+*.ai-analysis.json
+*._ai_/
+
+# C Build Artifacts & Binaries
+*.o
+*.obj
+*.so
+*.dylib
+*.dll
+*.a
+*.out
+*.exe
+server
+client
+exam_server
+exam_client
+test_runner
+build/
+bin/
+out/
+target/
+
+# Database & Runtime Data
+*.db
+*.db-shm
+*.db-wal
+*.db-journal
+exam.db
+exam.db-*
+*.csv.bak
+users.txt
+history.csv
+
+# Logs & Debugging
+*.log
+logs/
+server.log
+valgrind-out.txt
+gmon.out
+core
+core.*
+
+# Python Cache & Bytecode (PyQt5 client & test scripts)
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+*.egg-info/
+.venv/
+venv/
+ENV/
+
+# Environment & Secret files
+.env
+.env.*
