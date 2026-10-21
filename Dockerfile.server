@@ -11,6 +11,7 @@ RUN apt-get update && apt-get install -y \
     valgrind \
     gdb \
     curl \
+    python3 \
     dos2unix \
     && rm -rf /var/lib/apt/lists/*
 

@@ -38,7 +38,10 @@ check: test itest
 
 valgrind: server $(TEST_BIN)
 	@set -e; for t in $(TEST_BIN); do echo "== valgrind $$t"; $(VALGRIND) ./$$t; done
-	SERVER_WRAPPER="$(VALGRIND)" PYTHONDONTWRITEBYTECODE=1 python3 -B -m unittest discover -s tests/integration -p 'test_*.py'
+	rm -rf $(BUILD)/valgrind
+	SERVER_WRAPPER="$(VALGRIND)" VALGRIND_LOG_DIR=$(BUILD)/valgrind PYTHONDONTWRITEBYTECODE=1 python3 -B -m unittest discover -s tests/integration -p 'test_*.py'
+	@grep -h -e "ERROR SUMMARY" -e "All heap blocks" $(BUILD)/valgrind/*.log | sed 's/^==[0-9]*== //' | sort | uniq -c
+	@! grep -L "All heap blocks were freed" $(BUILD)/valgrind/*.log | grep .
 
 clean:
 	rm -rf $(BUILD) server
