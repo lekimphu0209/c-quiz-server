@@ -4,6 +4,7 @@
 #include "auth.h"
 #include "common.h"
 #include "db.h"
+#include "room.h"
 #include "session.h"
 
 static const char *const DUMMY_SALT = "0000000000000000";
@@ -89,6 +90,7 @@ int handle_login(request_t *req)
 int handle_logout(request_t *req)
 {
     log_msg(LOG_INFO, "fd=%d logout user=%s", req->sess->fd, req->sess->username);
+    room_on_signout(req->out, req->sess->user_id, req->sess->username);
     session_logout(req->sess);
     return reply_ok(req, "BYE");
 }

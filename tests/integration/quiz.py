@@ -193,8 +193,8 @@ class QuizTestCase(unittest.TestCase):
             QuizTestCase._counter += 1
             return "%s%d" % (prefix, QuizTestCase._counter)
 
-    def login(self, username, password="123456"):
-        client = self.connect()
+    def login(self, username, password="123456", client=None):
+        client = client or self.connect()
         deadline = time.time() + TIMEOUT
         reply = client.call("LOGIN|%s|%s" % (username, password))
         while reply.startswith("ERR|ALREADY_LOGGED_IN|") and time.time() < deadline:
@@ -207,9 +207,14 @@ class QuizTestCase(unittest.TestCase):
 
     def user(self, prefix="u", password="123456"):
         username = self.unique(prefix)
-        registrar = self.connect()
-        self.assertEqual(registrar.call("REGISTER|%s|%s" % (username, password)), "OK|REGISTERED")
-        return self.login(username, password)
+        client = self.connect()
+        self.assertEqual(client.call("REGISTER|%s|%s" % (username, password)), "OK|REGISTERED")
+        return self.login(username, password, client)
+
+    def create_room(self, host, n=3, sec=120, cfg="mixed", topic="all", name="Phong thi"):
+        reply = host.call("CREATE_ROOM|%s|%s|%d|%d|%s|%s" % (host.token, name, n, sec, cfg, topic))
+        self.assertRegex(reply, r"^OK\|\d+$")
+        return int(reply.split("|")[1])
 
     def admin(self):
         return self.login(ADMIN_USER, ADMIN_PASS)

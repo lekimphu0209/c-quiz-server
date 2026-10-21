@@ -7,6 +7,7 @@
 #include "common.h"
 #include "protocol.h"
 #include "question.h"
+#include "room.h"
 #include "session.h"
 
 typedef struct {
@@ -27,6 +28,10 @@ static const command_t COMMANDS[] = {
     { "ADD_QUESTION", 10, 11, 1, 1, handle_add_question },
     { "DEL_QUESTION", 3, 3, 1, 1, handle_del_question },
     { "IMPORT_CSV", 3, 3, 1, 1, handle_import_csv },
+    { "CREATE_ROOM", 7, 7, 1, 0, handle_create_room },
+    { "LIST_ROOMS", 2, 3, 1, 0, handle_list_rooms },
+    { "JOIN", 3, 3, 1, 0, handle_join },
+    { "LEAVE_ROOM", 3, 3, 1, 0, handle_leave_room },
 };
 
 static pthread_mutex_t g_core_lock = PTHREAD_MUTEX_INITIALIZER;
@@ -177,6 +182,11 @@ void protocol_disconnect(session_t *sess)
 
     outbox_init(&out);
     log_msg(LOG_INFO, "fd=%d disconnected user=%s", sess->fd, sess->user_id ? sess->username : "-");
+
+    // leave lobby rooms first so peers get MEMBER_LEFT or ROOM_CLOSED
+    core_lock();
+    if (sess->user_id) room_on_signout(&out, sess->user_id, sess->username);
+    core_unlock();
     session_close(sess);
     outbox_flush(&out, NULL);
     outbox_free(&out);

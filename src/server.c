@@ -15,6 +15,7 @@
 
 #include "common.h"
 #include "db.h"
+#include "db_room.h"
 #include "protocol.h"
 #include "session.h"
 
@@ -209,6 +210,7 @@ int main(int argc, char **argv)
     install_signals();
     sessions_init();
     if (db_open(cfg.db_path) != DB_OK || db_seed_defaults() != DB_OK) goto cleanup;
+    if (db_room_reset_waiting() < 0) goto cleanup;
     listen_fd = open_listener(cfg.port);
     if (listen_fd < 0) goto cleanup;
 
