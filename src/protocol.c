@@ -6,6 +6,7 @@
 #include "auth.h"
 #include "common.h"
 #include "protocol.h"
+#include "question.h"
 #include "session.h"
 
 typedef struct {
@@ -22,6 +23,10 @@ static const command_t COMMANDS[] = {
     { "REGISTER", 3, 3, 0, 0, handle_register },
     { "LOGIN", 3, 3, 0, 0, handle_login },
     { "LOGOUT", 2, 2, 1, 0, handle_logout },
+    { "LIST_QUESTIONS", 2, 2, 1, 1, handle_list_questions },
+    { "ADD_QUESTION", 10, 11, 1, 1, handle_add_question },
+    { "DEL_QUESTION", 3, 3, 1, 1, handle_del_question },
+    { "IMPORT_CSV", 3, 3, 1, 1, handle_import_csv },
 };
 
 static pthread_mutex_t g_core_lock = PTHREAD_MUTEX_INITIALIZER;
