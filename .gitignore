@@ -52,11 +52,10 @@ TASKS.md
 *.a
 *.out
 *.exe
-server
-client
-exam_server
-exam_client
-test_runner
+/server
+/exam_server
+/exam_client
+/test_runner
 build/
 bin/
 out/
