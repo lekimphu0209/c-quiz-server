@@ -16,6 +16,7 @@
 #include "common.h"
 #include "db.h"
 #include "db_room.h"
+#include "exam.h"
 #include "protocol.h"
 #include "session.h"
 
@@ -188,6 +189,7 @@ static void drain_workers(void)
 static void shutdown_server(int listen_fd)
 {
     if (listen_fd >= 0) close(listen_fd);
+    exam_ticker_stop();
     drain_workers();
     db_close();
     sessions_destroy();
@@ -212,7 +214,7 @@ int main(int argc, char **argv)
     if (db_open(cfg.db_path) != DB_OK || db_seed_defaults() != DB_OK) goto cleanup;
     if (db_room_reset_waiting() < 0) goto cleanup;
     listen_fd = open_listener(cfg.port);
-    if (listen_fd < 0) goto cleanup;
+    if (listen_fd < 0 || exam_ticker_start() != 0) goto cleanup;
 
     log_msg(LOG_INFO, "listening on 0.0.0.0:%d", cfg.port);
     accept_loop(listen_fd);

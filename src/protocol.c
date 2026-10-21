@@ -5,6 +5,7 @@
 
 #include "auth.h"
 #include "common.h"
+#include "exam.h"
 #include "protocol.h"
 #include "question.h"
 #include "room.h"
@@ -32,6 +33,12 @@ static const command_t COMMANDS[] = {
     { "LIST_ROOMS", 2, 3, 1, 0, handle_list_rooms },
     { "JOIN", 3, 3, 1, 0, handle_join },
     { "LEAVE_ROOM", 3, 3, 1, 0, handle_leave_room },
+    { "START_ROOM", 3, 3, 1, 0, handle_start_room },
+    { "ANSWER", 5, 5, 1, 0, handle_answer },
+    { "SUBMIT", 3, 3, 1, 0, handle_submit },
+    { "END_ROOM", 3, 3, 1, 0, handle_end_room },
+    { "GET_QUESTIONS", 3, 3, 1, 0, handle_get_questions },
+    { "ROOM_RESULT", 3, 3, 1, 0, handle_room_result },
 };
 
 static pthread_mutex_t g_core_lock = PTHREAD_MUTEX_INITIALIZER;
