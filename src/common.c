@@ -11,6 +11,7 @@
 #include <sys/socket.h>
 
 #include "common.h"
+#include "sha256.h"
 
 #ifdef MSG_NOSIGNAL
 #define SEND_FLAGS MSG_NOSIGNAL
@@ -259,6 +260,51 @@ int parse_int(const char *text, int *out)
     if (value < INT_MIN || value > INT_MAX) return -1;
     *out = (int)value;
     return 0;
+}
+
+int random_hex(char *out, size_t hex_len)
+{
+    unsigned char bytes[64];
+    size_t byte_len = hex_len / 2;
+    size_t got = 0;
+    size_t i = 0;
+    FILE *source = NULL;
+
+    if (!out || hex_len == 0 || hex_len % 2 != 0 || byte_len > sizeof(bytes)) return -1;
+    source = fopen("/dev/urandom", "rb");
+    if (!source) return -1;
+    got = fread(bytes, 1, byte_len, source);
+    fclose(source);
+    if (got != byte_len) return -1;
+    for (i = 0; i < byte_len; i++) snprintf(out + i * 2, 3, "%02x", bytes[i]);
+    return 0;
+}
+
+void hash_password(const char *salt, const char *password, char out_hex[HASH_HEX_LEN + 1])
+{
+    sha256_ctx_t ctx;
+    unsigned char digest[SHA256_DIGEST_LEN];
+    int i = 0;
+
+    sha256_init(&ctx);
+    sha256_update(&ctx, (const unsigned char *)salt, strlen(salt));
+    sha256_update(&ctx, (const unsigned char *)password, strlen(password));
+    sha256_final(&ctx, digest);
+    for (i = 0; i < SHA256_DIGEST_LEN; i++) snprintf(out_hex + i * 2, 3, "%02x", digest[i]);
+}
+
+int secure_equals(const char *left, const char *right)
+{
+    size_t left_len = left ? strlen(left) : 0;
+    size_t right_len = right ? strlen(right) : 0;
+    unsigned char diff = 0;
+    size_t i = 0;
+
+    if (!left || !right || left_len != right_len) return 0;
+
+    // scan every byte so timing never leaks the first mismatch position
+    for (i = 0; i < left_len; i++) diff |= (unsigned char)(left[i] ^ right[i]);
+    return diff == 0;
 }
 
 void log_open(const char *path, int echo_stdout)

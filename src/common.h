@@ -8,6 +8,11 @@
 #define MAX_SEND_PAYLOAD 262144
 #define MAX_FIELDS 32
 
+#define SALT_HEX_LEN 16
+#define HASH_HEX_LEN 64
+#define TOKEN_HEX_LEN 32
+#define TOKEN_LEN (TOKEN_HEX_LEN + 1)
+
 #define FRAME_OK 1
 #define FRAME_CLOSED 0
 #define FRAME_ERROR -1
@@ -45,6 +50,10 @@ const char *sb_str(const strbuf_t *sb);
 void unescape_inplace(char *text);
 int split_fields(char *line, char **fields, int max_fields);
 int parse_int(const char *text, int *out);
+
+int random_hex(char *out, size_t hex_len);
+void hash_password(const char *salt, const char *password, char out_hex[HASH_HEX_LEN + 1]);
+int secure_equals(const char *left, const char *right);
 
 void log_open(const char *path, int echo_stdout);
 void log_close(void);
