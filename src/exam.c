@@ -65,7 +65,7 @@ int exam_finalize(outbox_t *out, const room_t *room)
     return push_results(out, room);
 }
 
-static int load_member(request_t *req, room_t *room, attempt_t *attempt)
+int exam_load_member(request_t *req, room_t *room, attempt_t *attempt)
 {
     int found = 0;
 
@@ -76,7 +76,7 @@ static int load_member(request_t *req, room_t *room, attempt_t *attempt)
     return 0;
 }
 
-static int check_active(request_t *req, const room_t *room, const attempt_t *attempt)
+int exam_check_active(request_t *req, const room_t *room, const attempt_t *attempt)
 {
     long long now = (long long)time(NULL);
 
@@ -140,8 +140,8 @@ int handle_answer(request_t *req)
     int qidx = 0;
     int opt = 0;
 
-    if (load_member(req, &room, &attempt) != 0) return -1;
-    if (check_active(req, &room, &attempt) != 0) return -1;
+    if (exam_load_member(req, &room, &attempt) != 0) return -1;
+    if (exam_check_active(req, &room, &attempt) != 0) return -1;
     if (parse_int(req->argv[3], &qidx) != 0 || qidx < 1 || qidx > room.num_q) return reply_err(req, "BAD_ARGS", "qidx out of range");
     if (parse_int(req->argv[4], &opt) != 0 || opt < 0 || opt > 3) return reply_err(req, "BAD_ARGS", "opt must be 0-3");
     if (db_answer_save(attempt.att_id, qidx, opt) != DB_OK) return reply_err(req, "INTERNAL", "database error");
@@ -156,8 +156,8 @@ int handle_submit(request_t *req)
     attempt_t attempt;
     int score = 0;
 
-    if (load_member(req, &room, &attempt) != 0) return -1;
-    if (check_active(req, &room, &attempt) != 0) return -1;
+    if (exam_load_member(req, &room, &attempt) != 0) return -1;
+    if (exam_check_active(req, &room, &attempt) != 0) return -1;
     score = db_attempt_submit(attempt.att_id, (long long)time(NULL));
     if (score < 0) return reply_err(req, "INTERNAL", "database error");
 
@@ -188,7 +188,7 @@ int handle_get_questions(request_t *req)
     attempt_t attempt;
     strbuf_t *reply = NULL;
 
-    if (load_member(req, &room, &attempt) != 0) return -1;
+    if (exam_load_member(req, &room, &attempt) != 0) return -1;
     if (strcmp(room.status, "RUNNING") != 0) return reply_err(req, "BAD_STATE", "room is not running");
     reply = reply_begin(req);
     sb_appendf(reply, "|%d|%d", room.num_q, room.duration);

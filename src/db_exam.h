@@ -29,4 +29,7 @@ int db_room_pending(int rid);
 int db_room_finish(int rid);
 int db_room_results(int rid, result_row_t *rows, int max_rows);
 
+int db_answer_mask(int att_id, char *mask, int num_q);
+int db_resumable_room(int user_id, long long now);
+
 #endif

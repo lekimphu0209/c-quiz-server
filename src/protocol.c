@@ -6,6 +6,7 @@
 #include "auth.h"
 #include "common.h"
 #include "exam.h"
+#include "practice.h"
 #include "protocol.h"
 #include "question.h"
 #include "room.h"
@@ -39,6 +40,9 @@ static const command_t COMMANDS[] = {
     { "END_ROOM", 3, 3, 1, 0, handle_end_room },
     { "GET_QUESTIONS", 3, 3, 1, 0, handle_get_questions },
     { "ROOM_RESULT", 3, 3, 1, 0, handle_room_result },
+    { "PRACTICE", 6, 6, 1, 0, handle_practice },
+    { "PRACTICE_SUBMIT", 3, 3, 1, 0, handle_submit },
+    { "RESUME", 3, 3, 1, 0, handle_resume },
 };
 
 static pthread_mutex_t g_core_lock = PTHREAD_MUTEX_INITIALIZER;

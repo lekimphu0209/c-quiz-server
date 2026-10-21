@@ -1,9 +1,11 @@
 #include <ctype.h>
 #include <string.h>
+#include <time.h>
 
 #include "auth.h"
 #include "common.h"
 #include "db.h"
+#include "db_exam.h"
 #include "room.h"
 #include "session.h"
 
@@ -72,6 +74,7 @@ int handle_login(request_t *req)
     char token[TOKEN_LEN];
     strbuf_t *reply = NULL;
     int verified = 0;
+    int resume_rid = 0;
 
     if (req->sess->user_id != 0) return reply_err(req, "ALREADY_LOGGED_IN", "connection already authenticated");
     memset(&user, 0, sizeof(user));
@@ -84,6 +87,10 @@ int handle_login(request_t *req)
     log_msg(LOG_INFO, "fd=%d login user=%s role=%s", req->sess->fd, user.username, user.role);
     reply = reply_begin(req);
     sb_appendf(reply, "|%s|%s", token, user.role);
+
+    // flag unfinished attempts so the client can offer RESUME
+    resume_rid = db_resumable_room(user.id, (long long)time(NULL));
+    if (resume_rid > 0) sb_appendf(reply, "|RESUME|%d", resume_rid);
     return 0;
 }
 

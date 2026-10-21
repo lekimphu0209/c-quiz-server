@@ -1,3 +1,5 @@
+#include <string.h>
+
 #include <sqlite3.h>
 
 #include "common.h"
@@ -128,4 +130,25 @@ int db_room_results(int rid, result_row_t *rows, int max_rows)
     }
     sqlite3_finalize(stmt);
     return count;
+}
+
+int db_answer_mask(int att_id, char *mask, int num_q)
+{
+    sqlite3_stmt *stmt = db_prepare("SELECT qidx FROM attempt_answers WHERE att_id = ?", "i", att_id);
+    int qidx = 0;
+
+    if (!stmt) return DB_ERROR;
+    memset(mask, '0', (size_t)num_q);
+    mask[num_q] = '\0';
+    while (sqlite3_step(stmt) == SQLITE_ROW) {
+        qidx = sqlite3_column_int(stmt, 0);
+        if (qidx >= 1 && qidx <= num_q) mask[qidx - 1] = '1';
+    }
+    sqlite3_finalize(stmt);
+    return DB_OK;
+}
+
+int db_resumable_room(int user_id, long long now)
+{
+    return db_query_int("SELECT a.rid FROM attempts a JOIN rooms r ON r.rid = a.rid WHERE a.user_id = ? AND a.status = 'IN_PROGRESS' AND r.status = 'RUNNING' AND r.start_ts + r.duration_sec > ? ORDER BY a.att_id DESC LIMIT 1", 0, "il", user_id, now);
 }
