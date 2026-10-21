@@ -11,6 +11,7 @@
 #include "question.h"
 #include "room.h"
 #include "session.h"
+#include "stats.h"
 
 typedef struct {
     const char *name;
@@ -43,6 +44,9 @@ static const command_t COMMANDS[] = {
     { "PRACTICE", 6, 6, 1, 0, handle_practice },
     { "PRACTICE_SUBMIT", 3, 3, 1, 0, handle_submit },
     { "RESUME", 3, 3, 1, 0, handle_resume },
+    { "HISTORY", 2, 3, 1, 0, handle_history },
+    { "HISTORY_DETAIL", 3, 3, 1, 0, handle_history_detail },
+    { "STATS", 2, 3, 1, 0, handle_stats },
 };
 
 static pthread_mutex_t g_core_lock = PTHREAD_MUTEX_INITIALIZER;
